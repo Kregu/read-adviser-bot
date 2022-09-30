@@ -3,12 +3,16 @@ package read_adviser_bot
 import (
 	"flag"
 	"log"
+	"read-adviser-bot/clients/telegram"
+)
+
+const (
+	tgBotHost = "api.telegram.org"
 )
 
 func main() {
-	t := mustToken()
 
-	// tgClient = telegram.New(token)
+	tgClient = telegram.New(mustToken())
 
 	// fetcher = fetcher.New()
 
