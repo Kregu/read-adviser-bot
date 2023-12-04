@@ -3,22 +3,34 @@ package read_adviser_bot
 import (
 	"flag"
 	"log"
-	"read-adviser-bot/clients/telegram"
+	tgClient "read-adviser-bot/clients/telegram"
+	"read-adviser-bot/consumer/event_consumer"
+	"read-adviser-bot/storage/files"
+	"read-adviser-bot/events/telegram"
+
+
 )
 
 const (
 	tgBotHost = "api.telegram.org"
+	storagePath = "storage"
+	baseSize = 100
 )
 
 func main() {
 
-	tgClient = telegram.New(mustToken())
 
-	// fetcher = fetcher.New()
+	eventsProcessor := telegram.New(
+		tgClient.New(tgBotHost, mustToken()),
+		files.New(storagePath),
+	)
 
-	// processor = processor.New()
+	log.Print("service started")
 
-	// consumer.Start(fetcher, processor)
+	consumer:=event_consumer.New(eventsProcessor, eventsProcessor, baseSize)
+	if err:= consumer.Start(); err!=nil {
+		log.Fatal("service is stopped", err)
+	}
 
 }
 
