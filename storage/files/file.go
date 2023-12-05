@@ -16,8 +16,8 @@ type Storage struct {
 	basePath string
 }
 
-const defaultPerm = 0774
 
+const defaultPerm = 0774
 
 func New(basePath string) Storage {
 	return Storage{basePath: basePath}
@@ -25,6 +25,7 @@ func New(basePath string) Storage {
 
 func (s Storage) Save(page *storage.Page) (err error) {
 	defer func() { err = e.WrapIfErr("can't save page", err) }()
+
 	fPath := filepath.Join(s.basePath, page.UserName)
 
 	if err := os.MkdirAll(fPath, defaultPerm); err != nil {
@@ -35,6 +36,7 @@ func (s Storage) Save(page *storage.Page) (err error) {
 	if err != nil {
 		return err
 	}
+
 	fPath = filepath.Join(fPath, fName)
 
 	file, err := os.Create(fPath)
@@ -64,8 +66,8 @@ func (s Storage) PickRandom(userName string) (page *storage.Page, err error) {
 		return nil, storage.ErrNoSavedPages
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	n := rand.Intn(len(files))
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	n := r.Intn(len(files))
 
 	file := files[n]
 
@@ -88,7 +90,7 @@ func (s Storage) Remove(p *storage.Page) error {
 	return nil
 }
 
-func (s Storage) isExists(p *storage.Page) (bool, error) {
+func (s Storage) IsExist(p *storage.Page) (bool, error) {
 	fileName, err := fileName(p)
 	if err != nil {
 		return false, e.Wrap("can't check if file exists", err)
@@ -112,7 +114,7 @@ func (s Storage) decodePage(filePath string) (*storage.Page, error) {
 	if err != nil {
 		return nil, e.Wrap("can't decode page", err)
 	}
-	defer func() { _= f.Close() }()
+	defer func() { _ = f.Close() }()
 
 	var p storage.Page
 
