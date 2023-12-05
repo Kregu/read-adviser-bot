@@ -15,8 +15,6 @@ const (
 	baseSize    = 100
 )
 
-// 6651558558:AAGINW_ZSD8HOPEe3qaTJvC6LqgY-5UieJg
-
 func main() {
 
 	storage := files.New(storagePath)
