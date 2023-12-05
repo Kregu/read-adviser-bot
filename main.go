@@ -1,4 +1,4 @@
-package read_adviser_bot
+package main
 
 import (
 	"flag"

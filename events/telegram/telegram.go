@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"errors"
+	"log"
 	"read-adviser-bot/clients/telegram"
 	"read-adviser-bot/events"
 	"read-adviser-bot/lib/e"
@@ -51,6 +52,7 @@ func (p *Processor) Fetch(limit int) ([]events.Event, error) {
 }
 
 func (p *Processor) Process(event events.Event) error {
+	log.Print(event)
 	switch event.Type {
 	case events.Message:
 		return p.processMessage(event)
@@ -93,7 +95,7 @@ func event(upd telegram.Update) events.Event {
 	if updType == events.Message {
 		res.Meta = Meta{
 			ChatID:   upd.Message.Chat.ID,
-			Username: upd.Message.From.UserName,
+			Username: upd.Message.From.Username,
 		}
 	}
 	return res

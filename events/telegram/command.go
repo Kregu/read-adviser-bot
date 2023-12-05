@@ -17,6 +17,7 @@ const (
 
 func (p *Processor) doCmd(text string, chatID int, username string) error {
 	text = strings.TrimSpace(text)
+	log.Print(text)
 
 	log.Printf("got new command %s from %s", text, username)
 
@@ -91,7 +92,6 @@ func (p *Processor) sendHelp(chatID int) error {
 func (p *Processor) sendHello(chatID int) error {
 	return p.tg.SendMessage(chatID, msgHello)
 }
-
 
 func isAddCmd(text string) bool {
 	return isURL(text)

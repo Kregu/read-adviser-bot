@@ -3,11 +3,12 @@ package telegram
 import (
 	"encoding/json"
 	"io"
-	"read-adviser-bot/lib/e"
 	"net/http"
 	"net/url"
 	"path"
 	"strconv"
+
+	"read-adviser-bot/lib/e"
 )
 
 type Client struct {
@@ -33,7 +34,8 @@ func newBasePath(token string) string {
 	return "bot" + token
 }
 
-func (c *Client) Updates(offset int, limit int) ([]Update, error) {
+func (c *Client) Updates(offset int, limit int) (updates []Update, err error) {
+	defer func() { err = e.WrapIfErr("can't get updates", err) }()
 
 	q := url.Values{}
 	q.Add("offset", strconv.Itoa(offset))
@@ -43,11 +45,13 @@ func (c *Client) Updates(offset int, limit int) ([]Update, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	var res UpdatesResponse
 
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err
 	}
+
 	return res.Result, nil
 }
 
@@ -60,22 +64,24 @@ func (c *Client) SendMessage(chatID int, text string) error {
 	if err != nil {
 		return e.Wrap("can't send message", err)
 	}
+
 	return nil
 }
 
 func (c *Client) doRequest(method string, query url.Values) (data []byte, err error) {
-
-	defer func() { err = e.WrapIfErr("can't do request %w", err) }()
+	defer func() { err = e.WrapIfErr("can't do request", err) }()
 
 	u := url.URL{
-		Scheme: "http",
+		Scheme: "https",
 		Host:   c.host,
 		Path:   path.Join(c.basePath, method),
 	}
+
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
+
 	req.URL.RawQuery = query.Encode()
 
 	resp, err := c.client.Do(req)
@@ -88,5 +94,6 @@ func (c *Client) doRequest(method string, query url.Values) (data []byte, err er
 	if err != nil {
 		return nil, err
 	}
+
 	return body, nil
 }
